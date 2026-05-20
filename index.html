@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЕХНОТОЧКА — Конструктор карусели</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ════════════ SCREEN 1: COUNT ════════════ -->
+<div class="screen active" id="screen1">
+  <div class="logo"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  <div class="steps">
+    <div class="step-dot active" id="sd1"></div>
+    <div class="step-dot" id="sd2"></div>
+    <div class="step-dot" id="sd3"></div>
+    <div class="step-dot" id="sd4"></div>
+  </div>
+  <div class="s1-title">Сколько слайдов<br>в карусели?</div>
+  <div class="s1-sub">Рекомендуем <span>5–10 слайдов</span> для оптимального вовлечения</div>
+  <div class="counter-wrap">
+    <div>
+      <button class="counter-btn" id="btnMinus" onclick="changeCount(-1)">−</button>
+    </div>
+    <div style="text-align:center">
+      <div class="counter-num" id="countNum">0</div>
+      <div class="counter-label">слайдов</div>
+    </div>
+    <div>
+      <button class="counter-btn" id="btnPlus" onclick="changeCount(1)">+</button>
+    </div>
+  </div>
+  <button class="btn-primary" id="btn1Confirm" onclick="goScreen(2)" disabled>
+    Продолжить
+    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.17 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/></svg>
+  </button>
+</div>
+
+<!-- ════════════ SCREEN 2: TEXT ════════════ -->
+<div class="screen" id="screen2">
+  <button class="back-btn" onclick="goScreen(1)">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/></svg>
+    Назад
+  </button>
+  <div class="logo"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  <div class="steps">
+    <div class="step-dot done" id="sd1b"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="s2-title">Вставь свой текст</div>
+  <div class="s2-sub">ИИ автоматически разобьёт его по слайдам — заголовки, подзаголовки и детали</div>
+  <div class="text-input-outer">
+    <div class="text-input-wrap">
+      <textarea id="mainTextarea" placeholder="Вставь сюда текст поста, тезисы, список пунктов — всё что угодно...
+ИИ сам разберётся с разбивкой по слайдам 🤖"></textarea>
+    </div>
+    <button class="text-submit-btn" onclick="submitText()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+  <div class="hint-tags">
+    <span class="hint-tag" onclick="fillSample()">📋 Вставить пример текста</span>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN 3: STYLE ════════════ -->
+<div class="screen" id="screen3">
+  <button class="back-btn" onclick="goScreen(2)">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/></svg>
+    Назад
+  </button>
+  <div class="logo"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="s3-title">Выбери стиль</div>
+  <div class="s3-sub">Все 3 стиля в палитре ТЕХНОТОЧКИ — выбери который больше нравится</div>
+
+  <div class="style-picker">
+    <button class="style-nav-btn" onclick="changeStyle(-1)">←</button>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="style-preview selected" id="stylePreview">
+        <!-- filled by JS -->
+      </div>
+      <div class="style-name" id="styleName">Стиль A — Тёмный</div>
+      <div class="style-dots">
+        <div class="sdot active" onclick="setStyle(0)"></div>
+        <div class="sdot" onclick="setStyle(1)"></div>
+        <div class="sdot" onclick="setStyle(2)"></div>
+      </div>
+    </div>
+    <button class="style-nav-btn" onclick="changeStyle(1)">→</button>
+  </div>
+
+  <button class="btn-primary" onclick="generateSlides()">
+    Генерировать карусель
+    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.17 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/></svg>
+  </button>
+</div>
+
+<!-- ════════════ SCREEN 3b: LOADING ════════════ -->
+<div class="screen" id="screen3b">
+  <div class="loading-wrap">
+    <div class="loader"></div>
+    <div class="loading-text" id="loadingText">ИИ разбивает текст по слайдам...</div>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN 4: SLIDES ════════════ -->
+<div class="screen" id="screen4" style="justify-content:flex-start; padding-top:80px;">
+  <button class="back-btn" onclick="goScreen(3)">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/></svg>
+    Назад
+  </button>
+  <div class="s4-header">
+    <div>
+      <div class="s4-title">Готовая карусель</div>
+      <div class="s4-count" id="s4count"></div>
+    </div>
+    <button class="btn-dl-all" id="btnDlAll" onclick="downloadAllSlides()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Скачать все
+    </button>
+    <div class="logo" style="margin-bottom:0"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  </div>
+  <div class="slides-row" id="slidesRow"></div>
+  <div class="scroll-hint">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Листай вправо для просмотра всех слайдов
+  </div>
+</div>
+
+<!-- ════════════ EDIT MODAL ════════════ -->
+<input type="file" id="imgFileInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="handleImgInputChange(this)">
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">
+      Редактировать слайд
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="modal-cols">
+
+      <!-- LEFT: изображение -->
+      <div class="modal-col-left">
+        <span class="modal-col-heading">Изображение</span>
+
+        <div id="imgDropZone" class="img-drop-zone" onclick="triggerImgUpload()"></div>
+
+        <div id="imgSizeWrap" class="img-size-wrap" style="display:none">
+          <div class="img-size-row">
+            <span>Размер</span>
+            <span id="imgSizeVal">80px</span>
+          </div>
+          <input type="range" id="imgSizeRange" class="img-size-range"
+                 min="40" max="240" value="80"
+                 oninput="liveUpdateImgSize(this.value)">
+        </div>
+
+        <div class="img-drag-hint" id="imgDragHint" style="margin-top:12px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+          После применения — перетащи на слайде
+        </div>
+      </div>
+
+      <!-- RIGHT: текст -->
+      <div class="modal-col-right">
+        <span class="modal-col-heading">Содержимое</span>
+        <div class="modal-field">
+          <label class="modal-label">Бейдж / подпись</label>
+          <input class="modal-input" id="editBadge" placeholder="Причина 01">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Заголовок</label>
+          <textarea class="modal-textarea" id="editHeadline" rows="2"></textarea>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Описание</label>
+          <textarea class="modal-textarea" id="editBody" rows="3"></textarea>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Блок решения / акцент</label>
+          <textarea class="modal-textarea" id="editFix" rows="2"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /.modal-cols -->
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Отмена</button>
+      <button class="btn-primary" onclick="applyEdit()">Применить</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/logo-data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/slides.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
