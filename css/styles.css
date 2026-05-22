@@ -404,6 +404,7 @@ html, body {
 }
 .modal-textarea { resize:vertical; min-height:80px; line-height:1.5; }
 .modal-input:focus, .modal-textarea:focus { border-color:var(--orange); }
+#editBody { white-space:pre-wrap; }
 
 .modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:8px; }
 .btn-secondary {
@@ -457,6 +458,7 @@ html, body {
 .sA .s-body {
   font-family:'Inter', sans-serif;
   font-size:13px; font-weight:500; color:#555; line-height:1.6; margin-bottom:14px;
+  white-space:pre-wrap;
 }
 .sA .s-fix {
   background: linear-gradient(135deg, rgba(123,47,190,0.07), rgba(232,67,147,0.07));
@@ -504,6 +506,7 @@ html, body {
 .sB .s-body {
   font-family:'Inter', sans-serif;
   font-size:13px; font-weight:500; color:#666; line-height:1.6; margin-bottom:14px;
+  white-space:pre-wrap;
 }
 .sB .s-fix {
   border-left:3px solid #7B2FBE;
@@ -563,6 +566,7 @@ html, body {
 .sC .s-body {
   font-family:'Inter', sans-serif;
   font-size:13px; font-weight:500; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:14px;
+  white-space:pre-wrap;
 }
 .sC .s-fix {
   background:rgba(123,47,190,0.12);
@@ -581,6 +585,47 @@ html, body {
   height:22px; width:auto; display:block; object-fit:contain;
   filter: brightness(0) invert(1);
 }
+
+/* ────── CUSTOM BG UPLOAD ────── */
+.bg-upload-section {
+  margin-top:28px; width:100%; max-width:360px; text-align:center;
+}
+.bg-upload-title {
+  font-size:11px; color:var(--gray); text-transform:uppercase;
+  letter-spacing:.08em; margin-bottom:12px;
+}
+.bg-upload-title span { color:var(--gray2); font-size:11px; text-transform:none; letter-spacing:0; }
+.bg-upload-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; padding:14px 20px;
+  background:var(--bg3);
+  border:1.5px dashed var(--gray2);
+  border-radius:14px;
+  color:var(--gray);
+  font-family:var(--font-body); font-size:13px;
+  cursor:pointer; transition:all .2s;
+}
+.bg-upload-btn:hover { border-color:var(--orange); color:var(--orange); }
+.bg-preview-wrap {
+  display:none; align-items:center; gap:12px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:14px; padding:10px 14px;
+}
+.bg-preview-thumb {
+  width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0;
+}
+.bg-preview-name {
+  flex:1; font-size:12px; color:var(--white); text-align:left;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.bg-remove-btn {
+  width:28px; height:28px;
+  background:var(--bg4); border:1px solid var(--border);
+  border-radius:50%; color:var(--gray); font-size:16px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .2s; flex-shrink:0;
+}
+.bg-remove-btn:hover { color:var(--white); background:var(--gray3); }
 
 /* ────── LOADING STATE ────── */
 .loading-wrap {

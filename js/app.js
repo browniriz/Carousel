@@ -7,6 +7,7 @@ let editingIndex = -1;
 
 let _editImgData = null;
 let _editImgW = 80;
+let customBg = null;
 
 const styleNames = ['Стиль 1 — Яркий', 'Стиль 2 — Минимализм', 'Стиль 3 — Тёмный'];
 const styleClass = ['sA','sB','sC'];
@@ -57,6 +58,30 @@ function fillSample() {
 Иногда система загружает или устанавливает обновления в фоне.
 
 А ваш ноутбук летает или уже «думает» по 5 минут?`;
+}
+
+// ── Custom background ──
+function handleBgUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    customBg = ev.target.result;
+    document.getElementById('bgPreviewThumb').src = customBg;
+    document.getElementById('bgPreviewName').textContent = file.name;
+    document.getElementById('bgPreviewWrap').style.display = 'flex';
+    document.getElementById('bgUploadBtn').style.display = 'none';
+    renderStylePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeBg() {
+  customBg = null;
+  document.getElementById('bgPreviewWrap').style.display = 'none';
+  document.getElementById('bgUploadBtn').style.display = 'flex';
+  document.getElementById('bgFileInput').value = '';
+  renderStylePreview();
 }
 
 // ── Screen 3: style picker ──

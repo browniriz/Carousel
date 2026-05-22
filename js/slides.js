@@ -2,9 +2,12 @@ function buildSlideHTML(d, sc, preview=false) {
   const userImg = (!preview && d.img)
     ? `<img class="slide-user-img" src="${d.img}" style="left:${d.imgX||100}px;top:${d.imgY||180}px;width:${d.imgW||80}px;" draggable="false">`
     : '';
+  const bgStyle = customBg
+    ? `background:url('${customBg}') center/cover no-repeat;`
+    : '';
 
   if (sc === 'sA') return `
-    <div class="${sc}" style="width:100%;height:100%">
+    <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="blob-1"></div><div class="blob-2"></div><div class="blob-3"></div>
       <div class="s-badge">${d.badge}</div>
       <div class="s-headline">${d.headline}</div>
@@ -14,7 +17,7 @@ function buildSlideHTML(d, sc, preview=false) {
       <img class="brand-logo" src="logo.png" alt="" draggable="false">
     </div>`;
   if (sc === 'sB') return `
-    <div class="${sc}" style="width:100%;height:100%">
+    <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="accent-line"></div>
       <div class="s-badge">${d.badge}</div>
       <div class="s-headline">${d.headline}</div>
@@ -24,7 +27,7 @@ function buildSlideHTML(d, sc, preview=false) {
       <img class="brand-logo" src="logo.png" alt="" draggable="false">
     </div>`;
   if (sc === 'sC') return `
-    <div class="${sc}" style="width:100%;height:100%">
+    <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="glow"></div><div class="glow-2"></div>
       <div class="s-badge">${d.badge}</div>
       <div class="s-headline">${d.headline}</div>
@@ -260,12 +263,13 @@ function _contentHeight(ctx, d, s, cw, fixMaxW) {
   return h;
 }
 
-function _drawSlideA(ctx, d, size, logoImg, userImg) {
+function _drawSlideA(ctx, d, size, logoImg, userImg, customBgImg) {
   const s = size / 320, px = 32 * s, py = 32 * s, cw = size - 2 * px;
 
   ctx.save();
   ctx.beginPath(); ctx.rect(0, 0, size, size); ctx.clip();
-  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, size, size);
+  if (customBgImg) { ctx.drawImage(customBgImg, 0, 0, size, size); }
+  else { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, size, size); }
 
   { const bx=270*s,by=40*s,br=90*s, g=ctx.createRadialGradient(bx-br*.2,by-br*.2,0,bx,by,br);
     g.addColorStop(0,'#C77DFF'); g.addColorStop(1,'#7B2FBE');
@@ -336,12 +340,13 @@ function _drawSlideA(ctx, d, size, logoImg, userImg) {
   ctx.restore();
 }
 
-function _drawSlideB(ctx, d, size, logoImg, userImg) {
+function _drawSlideB(ctx, d, size, logoImg, userImg, customBgImg) {
   const s=size/320, px=32*s, py=32*s, cw=size-2*px;
 
   ctx.save();
   ctx.beginPath(); ctx.rect(0,0,size,size); ctx.clip();
-  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,size,size);
+  if (customBgImg) { ctx.drawImage(customBgImg, 0, 0, size, size); }
+  else { ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,size,size); }
 
   ctx.fillStyle='#7B2FBE';
   ctx.beginPath(); ctx.roundRect(px,0,36*s,3*s,[0,0,3*s,3*s]); ctx.fill();
@@ -395,12 +400,13 @@ function _drawSlideB(ctx, d, size, logoImg, userImg) {
   ctx.restore();
 }
 
-function _drawSlideC(ctx, d, size, logoImg, userImg) {
+function _drawSlideC(ctx, d, size, logoImg, userImg, customBgImg) {
   const s=size/320, px=32*s, py=32*s, cw=size-2*px;
 
   ctx.save();
   ctx.beginPath(); ctx.rect(0,0,size,size); ctx.clip();
-  ctx.fillStyle='#0D0D1A'; ctx.fillRect(0,0,size,size);
+  if (customBgImg) { ctx.drawImage(customBgImg, 0, 0, size, size); }
+  else { ctx.fillStyle='#0D0D1A'; ctx.fillRect(0,0,size,size); }
 
   const grid=24*s;
   ctx.strokeStyle='rgba(123,47,190,0.06)'; ctx.lineWidth=1;
@@ -492,10 +498,12 @@ async function downloadSlide(i) {
     const logoImg = (typeof LOGO_DATA_URL !== 'undefined' && LOGO_DATA_URL)
       ? await _loadImg(LOGO_DATA_URL) : null;
     const userImg = d.img ? await _loadImg(d.img) : null;
+    const customBgImg = (typeof customBg !== 'undefined' && customBg)
+      ? await _loadImg(customBg) : null;
 
-    if (sc === 'sA') _drawSlideA(ctx, d, size, logoImg, userImg);
-    else if (sc === 'sB') _drawSlideB(ctx, d, size, logoImg, userImg);
-    else if (sc === 'sC') _drawSlideC(ctx, d, size, logoImg, userImg);
+    if (sc === 'sA') _drawSlideA(ctx, d, size, logoImg, userImg, customBgImg);
+    else if (sc === 'sB') _drawSlideB(ctx, d, size, logoImg, userImg, customBgImg);
+    else if (sc === 'sC') _drawSlideC(ctx, d, size, logoImg, userImg, customBgImg);
 
     const link = document.createElement('a');
     link.download = `technotochka_slide_${i+1}.png`;
