@@ -9,14 +9,227 @@ let _editImgData = null;
 let _editImgW = 80;
 let customBg = null;
 
-const styleNames = ['Стиль 1 — Яркий', 'Стиль 2 — Минимализм', 'Стиль 3 — Тёмный'];
-const styleClass = ['sA','sB','sC'];
+const SLIDE_SIZE = 320;
+const DEFAULT_IMG_W = 80;
+const DEFAULT_IMG_MARGIN = 18;
+const PROJECTS_STORAGE_KEY = 'carouselBuilderProjects';
+
+function getDefaultImgPosition(imgW = DEFAULT_IMG_W) {
+  return {
+    x: Math.max(0, SLIDE_SIZE - imgW - DEFAULT_IMG_MARGIN),
+    y: DEFAULT_IMG_MARGIN
+  };
+}
+
+const styleNames = ['White Volt', 'Soft Glass', 'Violet Punch', 'Graphite Neon', 'Dark Pulse'];
+const styleClass = ['sA','sB','sD','sE','sC'];
 
 // ── Screen navigation ──
 function goScreen(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen' + n).classList.add('active');
   window.scrollTo(0,0);
+}
+
+// ── Projects ──
+function getProjectTitle() {
+  const fromFirstSlide = (slidesData[0] && slidesData[0].headline || '').trim();
+  const fromText = (userText || '').split('\n').map(s => s.trim()).find(Boolean) || '';
+  return (fromFirstSlide || fromText || 'Без названия').slice(0, 64);
+}
+
+function readSavedProjects() {
+  try {
+    const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.warn('Cannot read saved projects:', e);
+    return [];
+  }
+}
+
+function writeSavedProjects(projects) {
+  try {
+    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+    return true;
+  } catch (e) {
+    console.error('Cannot save projects:', e);
+    return false;
+  }
+}
+
+function getCurrentProjectSnapshot() {
+  return {
+    id: `project_${Date.now()}`,
+    title: getProjectTitle(),
+    updatedAt: new Date().toISOString(),
+    slideCount,
+    userText,
+    selectedStyle,
+    customBg,
+    slidesData: slidesData.map(slide => ({ ...slide }))
+  };
+}
+
+function saveProject() {
+  if (!slidesData.length) {
+    showProjectToast('Нет слайдов для сохранения');
+    return;
+  }
+
+  const project = getCurrentProjectSnapshot();
+  const projects = readSavedProjects();
+  const sameTitleIndex = projects.findIndex(p => p.title === project.title);
+
+  if (sameTitleIndex >= 0) {
+    project.id = projects[sameTitleIndex].id;
+    projects[sameTitleIndex] = project;
+  } else {
+    projects.unshift(project);
+  }
+
+  if (!writeSavedProjects(projects)) {
+    showProjectToast('Не хватает места для сохранения');
+    return;
+  }
+  renderProjectsList();
+  showProjectToast('Проект сохранён');
+}
+
+function saveProjectFromModal() {
+  if (editingIndex >= 0) applyEdit(false);
+  saveProject();
+  closeModal();
+}
+
+function openProjectsScreen() {
+  renderProjectsList();
+  goScreen(5);
+}
+
+function loadProject(projectId) {
+  const project = readSavedProjects().find(p => p.id === projectId);
+  if (!project) return;
+
+  slideCount = project.slideCount || project.slidesData.length || 0;
+  userText = project.userText || '';
+  selectedStyle = styleClass[project.selectedStyle] ? project.selectedStyle : 0;
+  customBg = project.customBg || null;
+  slidesData = Array.isArray(project.slidesData) ? project.slidesData.map(slide => ({ ...slide })) : [];
+
+  document.getElementById('countNum').textContent = slideCount;
+  document.getElementById('btn1Confirm').disabled = slideCount === 0;
+  document.getElementById('mainTextarea').value = userText;
+  updateStyleDots();
+  renderStylePreview();
+  syncBgPreview();
+  renderAllSlides();
+  goScreen(4);
+}
+
+function deleteProject(projectId) {
+  const projects = readSavedProjects().filter(p => p.id !== projectId);
+  writeSavedProjects(projects);
+  renderProjectsList();
+}
+
+function startNewProject() {
+  slideCount = 0;
+  userText = '';
+  selectedStyle = 0;
+  slidesData = [];
+  editingIndex = -1;
+  _editImgData = null;
+  _editImgW = DEFAULT_IMG_W;
+  customBg = null;
+
+  document.getElementById('countNum').textContent = '0';
+  document.getElementById('btn1Confirm').disabled = true;
+  document.getElementById('mainTextarea').value = '';
+  document.getElementById('bgFileInput').value = '';
+  updateStyleDots();
+  renderStylePreview();
+  syncBgPreview();
+  goScreen(1);
+}
+
+function formatProjectDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function renderProjectsList() {
+  const list = document.getElementById('projectsList');
+  if (!list) return;
+
+  const projects = readSavedProjects();
+  if (!projects.length) {
+    list.innerHTML = `
+      <div class="projects-empty">
+        Пока нет сохранённых проектов. Собери карусель и нажми «Сохранить проект».
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = projects.map(project => `
+    <div class="project-card">
+      <div>
+        <div class="project-title">${escapeHtml(project.title || 'Без названия')}</div>
+        <div class="project-meta">${project.slideCount || 0} слайдов · ${escapeHtml(styleNames[project.selectedStyle] || 'Стиль')} · ${formatProjectDate(project.updatedAt)}</div>
+      </div>
+      <div class="project-actions">
+        <button class="btn-secondary" onclick="loadProject('${project.id}')">Открыть</button>
+        <button class="project-delete-btn" onclick="deleteProject('${project.id}')" title="Удалить">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showProjectToast(text) {
+  let toast = document.getElementById('projectToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'projectToast';
+    toast.className = 'project-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function syncBgPreview() {
+  const wrap = document.getElementById('bgPreviewWrap');
+  const btn = document.getElementById('bgUploadBtn');
+  const thumb = document.getElementById('bgPreviewThumb');
+  const name = document.getElementById('bgPreviewName');
+
+  if (customBg) {
+    thumb.src = customBg;
+    name.textContent = 'Сохранённый фон';
+    wrap.style.display = 'flex';
+    btn.style.display = 'none';
+  } else {
+    thumb.src = '';
+    wrap.style.display = 'none';
+    btn.style.display = 'flex';
+  }
 }
 
 // ── Screen 1: count ──
@@ -86,12 +299,13 @@ function removeBg() {
 
 // ── Screen 3: style picker ──
 function changeStyle(d) {
-  selectedStyle = (selectedStyle + d + 3) % 3;
+  selectedStyle = (selectedStyle + d + styleClass.length) % styleClass.length;
   renderStylePreview();
   updateStyleDots();
 }
 
 function setStyle(i) {
+  if (!styleClass[i]) return;
   selectedStyle = i;
   renderStylePreview();
   updateStyleDots();
@@ -107,9 +321,9 @@ function renderStylePreview() {
   const sc = styleClass[selectedStyle];
   wrap.innerHTML = buildSlideHTML({
     badge: 'ТЕХНОТОЧКА',
-    headline: 'Пример слайда',
-    body: 'Короткое описание или объяснение — читается за 2–3 секунды.',
-    fix: '✔ Решение или ключевой акцент здесь',
+    headline: 'Сильный хук',
+    body: 'Короткий текст, который быстро считывается в ленте.',
+    fix: 'Акцент, выгода или CTA здесь',
     num: '1 / 5'
   }, sc, true);
   document.getElementById('styleName').textContent = styleNames[selectedStyle];
@@ -125,7 +339,7 @@ function openEdit(i) {
   document.getElementById('editFix').value = d.fix || '';
 
   _editImgData = d.img || null;
-  _editImgW = d.imgW || 80;
+  _editImgW = d.imgW ?? DEFAULT_IMG_W;
   document.getElementById('imgSizeRange').value = _editImgW;
   document.getElementById('imgSizeVal').textContent = _editImgW + 'px';
   _renderImgZone();
@@ -138,9 +352,11 @@ function closeModal() {
   editingIndex = -1;
 }
 
-function applyEdit() {
+function applyEdit(closeAfter = true) {
   if (editingIndex < 0) return;
   const prev = slidesData[editingIndex];
+  const defaultImgPos = getDefaultImgPosition(_editImgW);
+  const hadImg = Boolean(prev.img);
   slidesData[editingIndex] = {
     badge:    document.getElementById('editBadge').value,
     headline: document.getElementById('editHeadline').value,
@@ -148,11 +364,11 @@ function applyEdit() {
     fix:      document.getElementById('editFix').value,
     img:      _editImgData,
     imgW:     _editImgW,
-    imgX:     _editImgData ? (prev.imgX || 100) : 0,
-    imgY:     _editImgData ? (prev.imgY || 180) : 0,
+    imgX:     _editImgData ? (hadImg ? (prev.imgX ?? defaultImgPos.x) : defaultImgPos.x) : 0,
+    imgY:     _editImgData ? (hadImg ? (prev.imgY ?? defaultImgPos.y) : defaultImgPos.y) : 0,
   };
   refreshSlide(editingIndex);
-  closeModal();
+  if (closeAfter) closeModal();
 }
 
 document.getElementById('editModal').addEventListener('click', e => {

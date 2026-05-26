@@ -10,10 +10,22 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<div class="neon-stage" aria-hidden="true">
+  <span class="orb orb-1"></span>
+  <span class="orb orb-2"></span>
+  <span class="slash slash-1"></span>
+  <span class="slash slash-2"></span>
+  <span class="spark spark-1"></span>
+  <span class="spark spark-2"></span>
+</div>
 
 <!-- ════════════ SCREEN 1: COUNT ════════════ -->
 <div class="screen active" id="screen1">
   <div class="logo"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  <div class="hero-brand" aria-label="Carousel Builder">
+    <img src="assets/carousel-builder-logo.png" alt="Carousel Builder">
+  </div>
+  <div class="hero-kicker">Создай. Настрой. Впечатли.</div>
   <div class="steps">
     <div class="step-dot active" id="sd1"></div>
     <div class="step-dot" id="sd2"></div>
@@ -38,6 +50,7 @@
     Продолжить
     <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.17 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/></svg>
   </button>
+  <button class="btn-secondary projects-entry-btn" onclick="openProjectsScreen()">Мои проекты</button>
 </div>
 
 <!-- ════════════ SCREEN 2: TEXT ════════════ -->
@@ -93,11 +106,13 @@
       <div class="style-preview selected" id="stylePreview">
         <!-- filled by JS -->
       </div>
-      <div class="style-name" id="styleName">Стиль A — Тёмный</div>
+      <div class="style-name" id="styleName">Neon Impact</div>
       <div class="style-dots">
         <div class="sdot active" onclick="setStyle(0)"></div>
         <div class="sdot" onclick="setStyle(1)"></div>
         <div class="sdot" onclick="setStyle(2)"></div>
+        <div class="sdot" onclick="setStyle(3)"></div>
+        <div class="sdot" onclick="setStyle(4)"></div>
       </div>
     </div>
     <button class="style-nav-btn" onclick="changeStyle(1)">→</button>
@@ -142,18 +157,41 @@
       <div class="s4-title">Готовая карусель</div>
       <div class="s4-count" id="s4count"></div>
     </div>
-    <button class="btn-dl-all" id="btnDlAll" onclick="downloadAllSlides()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      Скачать все
-    </button>
+    <div class="s4-actions">
+      <button class="btn-secondary" onclick="saveProject()">Сохранить проект</button>
+      <button class="btn-secondary" onclick="openProjectsScreen()">Мои проекты</button>
+      <button class="btn-dl-all" id="btnDlAll" onclick="downloadAllSlides()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Скачать все
+      </button>
+    </div>
     <div class="logo" style="margin-bottom:0"><div class="dot"></div>ТЕХНОТОЧКА</div>
   </div>
   <div class="slides-row" id="slidesRow"></div>
   <div class="scroll-hint">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     Листай вправо для просмотра всех слайдов
+  </div>
+</div>
+
+<!-- ════════════ SCREEN 5: PROJECTS ════════════ -->
+<div class="screen" id="screen5" style="justify-content:flex-start; padding-top:80px;">
+  <button class="back-btn" onclick="goScreen(slidesData.length ? 4 : 1)">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/></svg>
+    Назад
+  </button>
+  <div class="logo"><div class="dot"></div>ТЕХНОТОЧКА</div>
+  <div class="projects-shell">
+    <div class="projects-head">
+      <div>
+        <div class="s4-title">Мои проекты</div>
+        <div class="s4-count">Сохранённые карусели в этом браузере</div>
+      </div>
+      <button class="btn-secondary" onclick="startNewProject()">Новый проект</button>
+    </div>
+    <div class="projects-list" id="projectsList"></div>
   </div>
 </div>
 
@@ -216,6 +254,7 @@
 
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Отмена</button>
+      <button class="btn-secondary" onclick="saveProjectFromModal()">Сохранить проект</button>
       <button class="btn-primary" onclick="applyEdit()">Применить</button>
     </div>
   </div>
