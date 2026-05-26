@@ -278,15 +278,24 @@ function _loadImg(src) {
 
 function _textLines(ctx, text, maxW) {
   if (!text) return [];
-  const words = text.split(' ');
   const lines = [];
-  let line = '';
-  for (const word of words) {
-    const probe = line ? `${line} ${word}` : word;
-    if (line && ctx.measureText(probe).width > maxW) { lines.push(line); line = word; }
-    else line = probe;
+
+  for (const paragraph of String(text).replace(/\r\n/g, '\n').split('\n')) {
+    if (!paragraph.trim()) {
+      lines.push('');
+      continue;
+    }
+
+    const words = paragraph.split(' ');
+    let line = '';
+    for (const word of words) {
+      const probe = line ? `${line} ${word}` : word;
+      if (line && ctx.measureText(probe).width > maxW) { lines.push(line); line = word; }
+      else line = probe;
+    }
+    if (line) lines.push(line);
   }
-  if (line) lines.push(line);
+
   return lines;
 }
 
