@@ -407,43 +407,40 @@ function _drawNeonBackground(ctx, size, customBgImg, variant = 0) {
   ctx.fillStyle = glowB;
   ctx.fillRect(0, 0, size, size);
 
-  ctx.globalAlpha = variant >= 10 ? 0.12 : 0.22;
-  ctx.strokeStyle = '#8B32FF';
-  ctx.lineWidth = Math.max(1, size * .002);
-  const grid = size / 13;
-  for (let x = -grid; x < size + grid; x += grid) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x + size * .18, size);
-    ctx.stroke();
+  // Diagonal lines — only sD (variant 12) and sE (variant 4) have them in CSS
+  if (variant === 4 || variant === 12) {
+    ctx.globalAlpha = 0.22;
+    ctx.strokeStyle = '#8B32FF';
+    ctx.lineWidth = Math.max(1, size * .002);
+    const grid = size / 13;
+    for (let x = -grid; x < size + grid; x += grid) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + size * .18, size);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
   }
-  ctx.globalAlpha = 1;
 
-  const stroke = ctx.createLinearGradient(0, size * .3, size, size * .72);
-  stroke.addColorStop(0, 'rgba(139,50,255,0)');
-  stroke.addColorStop(.32, 'rgba(139,50,255,0.95)');
-  stroke.addColorStop(.5, 'rgba(244,241,255,0.9)');
-  stroke.addColorStop(.72, 'rgba(139,50,255,0.92)');
-  stroke.addColorStop(1, 'rgba(139,50,255,0)');
-  ctx.strokeStyle = stroke;
-  ctx.lineCap = 'round';
-  ctx.lineWidth = size * .012;
-  ctx.shadowColor = '#8B32FF';
-  ctx.shadowBlur = size * .025;
-  ctx.beginPath();
-  ctx.moveTo(-size * .08, size * .72);
-  ctx.bezierCurveTo(size * .26, size * .62, size * .66, size * .76, size * 1.08, size * .56);
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  ctx.save();
-  ctx.translate(size * .82, size * .2);
-  ctx.rotate(-0.18);
-  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-  ctx.lineWidth = size * .002;
-  _rRect(ctx, -size * .13, -size * .08, size * .26, size * .16, size * .025);
-  ctx.stroke();
-  ctx.restore();
+  // Neon arc stroke — only sD (variant 12) has ::after arc in CSS
+  if (variant === 12) {
+    const stroke = ctx.createLinearGradient(0, size * .3, size, size * .72);
+    stroke.addColorStop(0, 'rgba(139,50,255,0)');
+    stroke.addColorStop(.32, 'rgba(139,50,255,0.95)');
+    stroke.addColorStop(.5, 'rgba(244,241,255,0.9)');
+    stroke.addColorStop(.72, 'rgba(139,50,255,0.92)');
+    stroke.addColorStop(1, 'rgba(139,50,255,0)');
+    ctx.strokeStyle = stroke;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = size * .012;
+    ctx.shadowColor = '#8B32FF';
+    ctx.shadowBlur = size * .025;
+    ctx.beginPath();
+    ctx.moveTo(-size * .08, size * .72);
+    ctx.bezierCurveTo(size * .26, size * .62, size * .66, size * .76, size * 1.08, size * .56);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
 
   ctx.restore();
 }
@@ -459,16 +456,23 @@ function _drawNeonBadge(ctx, text, x, y, s, variant = 0) {
   const bW = ctx.measureText(bText).width + bPad * 2;
 
   if (variant === 1 || variant === 11 || variant === 12) {
-    ctx.fillStyle = variant >= 11 ? '#6414FF' : '#C6A5FF';
-    ctx.shadowColor = '#8B32FF';
-    ctx.shadowBlur = 10 * s;
+    ctx.fillStyle = variant === 12 ? '#6414FF' : '#C6A5FF';
+    if (variant === 12) {
+      ctx.shadowColor = '#8B32FF';
+      ctx.shadowBlur = 10 * s;
+    }
     ctx.fillText(bText, x, y + bVPad);
     ctx.shadowBlur = 0;
-    const line = ctx.createLinearGradient(x + bW, y, x + bW + 36 * s, y);
-    line.addColorStop(0, 'rgba(198,165,255,.9)');
-    line.addColorStop(1, 'rgba(139,50,255,0)');
-    ctx.fillStyle = line;
-    ctx.fillRect(x + bW - bPad + 8 * s, y + bH * .48, 36 * s, 1.5 * s);
+    if (variant === 12) {
+      const line = ctx.createLinearGradient(x + bW, y, x + bW + 36 * s, y);
+      line.addColorStop(0, 'rgba(198,165,255,.9)');
+      line.addColorStop(1, 'rgba(139,50,255,0)');
+      ctx.fillStyle = line;
+      ctx.fillRect(x + bW - bPad + 8 * s, y + bH * .48, 36 * s, 2 * s);
+    } else if (variant === 11) {
+      ctx.fillStyle = 'rgba(123,47,190,0.35)';
+      ctx.fillRect(x + bW - bPad + 8 * s, y + bH * .48, 32 * s, 1 * s);
+    }
     return bH + 12 * s;
   }
 
@@ -511,12 +515,19 @@ function _drawNeonFix(ctx, text, x, y, w, s, variant = 0) {
   }
 
   _rRect(ctx, x, y, w, fH, 12 * s);
-  ctx.fillStyle = variant >= 10 ? 'rgba(139,50,255,0.1)' : (variant === 2 ? 'rgba(139,50,255,0.18)' : 'rgba(255,255,255,0.08)');
+  ctx.fillStyle = variant === 11 ? 'rgba(255,255,255,0.5)'
+    : variant === 10 || variant === 12 ? 'rgba(139,50,255,0.1)'
+    : variant === 2 ? 'rgba(139,50,255,0.16)'
+    : variant === 4 ? 'rgba(139,50,255,0.14)'
+    : 'rgba(255,255,255,0.08)';
   ctx.fill();
-  ctx.strokeStyle = variant >= 10 ? 'rgba(139,50,255,0.28)' : 'rgba(176,108,255,0.42)';
+  ctx.strokeStyle = variant === 11 ? 'rgba(139,50,255,0.24)'
+    : variant === 10 || variant === 12 ? 'rgba(139,50,255,0.28)'
+    : variant === 4 ? 'rgba(176,108,255,0.34)'
+    : 'rgba(176,108,255,0.42)';
   ctx.lineWidth = 1.2 * s;
   ctx.stroke();
-  ctx.fillStyle = variant >= 10 ? '#2A064D' : 'rgba(255,255,255,0.86)';
+  ctx.fillStyle = variant === 11 ? '#211131' : variant >= 10 ? '#2A064D' : 'rgba(255,255,255,0.86)';
   fLines.forEach((l, li) => ctx.fillText(l, x + fpx, y + fpy + li * fSize * 1.5));
   return fH;
 }
@@ -556,15 +567,20 @@ function _drawSlideA(ctx, d, size, logoImg, userImg, customBgImg) {
   ctx.beginPath(); ctx.rect(0, 0, size, size); ctx.clip();
   _drawNeonBackground(ctx, size, customBgImg, 10);
 
+  // blob-3: small gradient dot bottom-right (CSS: bottom:50px right:24px, 48x48)
+  const b3R = 24 * s;
+  const b3X = size - 48 * s;
+  const b3Y = size - 74 * s;
   ctx.save();
-  ctx.translate(size * .58, size * .54);
-  ctx.rotate(-0.08);
-  ctx.fillStyle = 'rgba(255,255,255,0.42)';
-  ctx.strokeStyle = 'rgba(210,190,255,0.22)';
-  ctx.lineWidth = 1.2 * s;
-  _rRect(ctx, -size * .25, -size * .22, size * .5, size * .44, 24 * s);
+  ctx.globalAlpha = 0.55;
+  const b3g = ctx.createLinearGradient(b3X - b3R, b3Y - b3R, b3X + b3R, b3Y + b3R);
+  b3g.addColorStop(0, '#F4F1FF');
+  b3g.addColorStop(1, '#8B32FF');
+  ctx.fillStyle = b3g;
+  ctx.beginPath();
+  ctx.arc(b3X, b3Y, b3R, 0, Math.PI * 2);
   ctx.fill();
-  ctx.stroke();
+  ctx.globalAlpha = 1;
   ctx.restore();
 
   ctx.textBaseline = 'top';
@@ -603,20 +619,13 @@ function _drawSlideB(ctx, d, size, logoImg, userImg, customBgImg) {
   ctx.beginPath(); ctx.rect(0,0,size,size); ctx.clip();
   _drawNeonBackground(ctx, size, customBgImg, 11);
 
-  ctx.fillStyle='rgba(255,255,255,0.48)';
-  _rRect(ctx, 24*s, 24*s, size - 48*s, size - 48*s, 20*s);
-  ctx.fill();
-  ctx.strokeStyle='rgba(210,190,255,0.18)';
-  ctx.lineWidth=1*s;
-  ctx.stroke();
-
-  const topLine = ctx.createLinearGradient(px, 0, px + 110*s, 0);
+  const topLine = ctx.createLinearGradient(px, 0, px + 36*s, 0);
   topLine.addColorStop(0, '#F4F1FF');
   topLine.addColorStop(1, '#8B32FF');
   ctx.fillStyle=topLine;
   ctx.shadowColor='#8B32FF';
   ctx.shadowBlur=12*s;
-  ctx.fillRect(px,0,72*s,4*s);
+  ctx.fillRect(px,0,36*s,4*s);
   ctx.shadowBlur=0;
 
   ctx.textBaseline='top';
@@ -652,10 +661,31 @@ function _drawSlideC(ctx, d, size, logoImg, userImg, customBgImg) {
   ctx.beginPath(); ctx.rect(0,0,size,size); ctx.clip();
   _drawNeonBackground(ctx, size, customBgImg, 2);
 
-  const grid=24*s;
-  ctx.strokeStyle='rgba(198,165,255,0.08)'; ctx.lineWidth=1;
-  for (let gx=0;gx<size;gx+=grid){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,size);ctx.stroke();}
-  for (let gy=0;gy<size;gy+=grid){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(size,gy);ctx.stroke();}
+  // ::before overlay: two diagonal light streaks (CSS replaces old grid)
+  ctx.save();
+  ctx.translate(size * .12, size * .5);
+  ctx.rotate(0.44); // ~25deg from horizontal = 115deg CSS gradient direction
+  const streak1 = ctx.createLinearGradient(-size * .7, 0, size * .7, 0);
+  streak1.addColorStop(0, 'rgba(139,50,255,0)');
+  streak1.addColorStop(.48, 'rgba(139,50,255,0.22)');
+  streak1.addColorStop(.52, 'rgba(139,50,255,0.22)');
+  streak1.addColorStop(1, 'rgba(139,50,255,0)');
+  ctx.fillStyle = streak1;
+  ctx.fillRect(-size * .7, -size * .04, size * 1.4, size * .08);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(size * .62, 0);
+  ctx.rotate(0.14); // ~8deg = 172deg CSS direction
+  const streak2 = ctx.createLinearGradient(0, 0, 0, size);
+  streak2.addColorStop(0, 'rgba(255,255,255,0)');
+  streak2.addColorStop(.59, 'rgba(255,255,255,0)');
+  streak2.addColorStop(.605, 'rgba(255,255,255,0.08)');
+  streak2.addColorStop(.62, 'rgba(255,255,255,0)');
+  streak2.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = streak2;
+  ctx.fillRect(-size * .05, 0, size * .1, size);
+  ctx.restore();
 
   ctx.textBaseline='top';
   let y=Math.max(py, (size - _contentHeight(ctx, d, s, cw, cw-26*s)) / 2);
