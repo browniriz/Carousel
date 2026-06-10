@@ -7,7 +7,16 @@ let editingIndex = -1;
 
 let _editImgData = null;
 let _editImgW = 80;
+let _editFont = null;
+let _editFontSize = null;
 let customBg = null;
+
+const fontOptions = [
+  { name: 'VAG World Bold', label: 'VAG World Bold' },
+  { name: 'Nokia Sans S60', label: 'Nokia Sans' },
+  { name: 'Spectrashell',   label: 'Spectrashell' },
+  { name: 'Zing Rust',      label: 'Zing Rust' },
+];
 
 const SLIDE_SIZE = 320;
 const DEFAULT_IMG_W = 80;
@@ -316,6 +325,26 @@ function updateStyleDots() {
   document.getElementById('styleName').textContent = styleNames[selectedStyle];
 }
 
+function updateEditFontSize(val) {
+  _editFontSize = parseInt(val);
+  document.getElementById('editFontSizeVal').textContent = val + 'px';
+}
+
+function setEditFont(i) {
+  _editFont = fontOptions[i].name;
+  _renderModalFontPicker();
+}
+
+function _renderModalFontPicker() {
+  const picker = document.getElementById('modalFontPicker');
+  if (!picker) return;
+  picker.innerHTML = fontOptions.map((f, i) => `
+    <button class="font-btn${_editFont === f.name ? ' active' : ''}"
+            style="font-family:'${f.name}',sans-serif"
+            onclick="setEditFont(${i})">${f.label}</button>
+  `).join('');
+}
+
 function renderStylePreview() {
   const wrap = document.getElementById('stylePreview');
   const sc = styleClass[selectedStyle];
@@ -340,9 +369,15 @@ function openEdit(i) {
 
   _editImgData = d.img || null;
   _editImgW = d.imgW ?? DEFAULT_IMG_W;
+  _editFont = d.font || null;
+  _editFontSize = d.fontSize || null;
   document.getElementById('imgSizeRange').value = _editImgW;
   document.getElementById('imgSizeVal').textContent = _editImgW + 'px';
+  const fsVal = _editFontSize || 28;
+  document.getElementById('editFontSize').value = fsVal;
+  document.getElementById('editFontSizeVal').textContent = fsVal + 'px';
   _renderImgZone();
+  _renderModalFontPicker();
 
   document.getElementById('editModal').classList.add('open');
 }
@@ -362,6 +397,8 @@ function applyEdit(closeAfter = true) {
     headline: document.getElementById('editHeadline').value,
     body:     document.getElementById('editBody').value,
     fix:      document.getElementById('editFix').value,
+    font:     _editFont || null,
+    fontSize: _editFontSize || null,
     img:      _editImgData,
     imgW:     _editImgW,
     imgX:     _editImgData ? (hadImg ? (prev.imgX ?? defaultImgPos.x) : defaultImgPos.x) : 0,

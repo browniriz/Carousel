@@ -1,3 +1,7 @@
+function _headFont(d) {
+  return (d && d.font) ? d.font : 'VAG World Bold';
+}
+
 function buildSlideHTML(d, sc, preview=false) {
   const imgW = d.imgW ?? 80;
   const imgX = d.imgX ?? Math.max(0, 320 - imgW - 18);
@@ -8,12 +12,17 @@ function buildSlideHTML(d, sc, preview=false) {
   const bgStyle = customBg
     ? `background:url('${customBg}') center/cover no-repeat;`
     : '';
+  const hlStyles = [
+    d.font     ? `font-family:'${d.font}',sans-serif` : '',
+    d.fontSize ? `font-size:${d.fontSize}px`          : '',
+  ].filter(Boolean).join(';');
+  const hlFontStyle = hlStyles ? ` style="${hlStyles}"` : '';
 
   if (sc === 'sA') return `
     <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="blob-1"></div><div class="blob-2"></div><div class="blob-3"></div>
       <div class="s-badge">${d.badge}</div>
-      <div class="s-headline">${d.headline}</div>
+      <div class="s-headline"${hlFontStyle}>${d.headline}</div>
       ${d.body ? `<div class="s-body">${d.body}</div>` : ''}
       ${d.fix ? `<div class="s-fix">${d.fix}</div>` : ''}
       ${userImg}
@@ -23,7 +32,7 @@ function buildSlideHTML(d, sc, preview=false) {
     <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="accent-line"></div>
       <div class="s-badge">${d.badge}</div>
-      <div class="s-headline">${d.headline}</div>
+      <div class="s-headline"${hlFontStyle}>${d.headline}</div>
       ${d.body ? `<div class="s-body">${d.body}</div>` : ''}
       ${d.fix ? `<div class="s-fix">${d.fix}</div>` : ''}
       ${userImg}
@@ -33,7 +42,7 @@ function buildSlideHTML(d, sc, preview=false) {
     <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="glow"></div><div class="glow-2"></div>
       <div class="s-badge">${d.badge}</div>
-      <div class="s-headline">${d.headline}</div>
+      <div class="s-headline"${hlFontStyle}>${d.headline}</div>
       ${d.body ? `<div class="s-body">${d.body}</div>` : ''}
       ${d.fix ? `<div class="s-fix">${d.fix}</div>` : ''}
       ${userImg}
@@ -43,7 +52,7 @@ function buildSlideHTML(d, sc, preview=false) {
     <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="punch-orb"></div><div class="punch-streak"></div>
       <div class="s-badge">${d.badge}</div>
-      <div class="s-headline">${d.headline}</div>
+      <div class="s-headline"${hlFontStyle}>${d.headline}</div>
       ${d.body ? `<div class="s-body">${d.body}</div>` : ''}
       ${d.fix ? `<div class="s-fix">${d.fix}</div>` : ''}
       ${userImg}
@@ -53,7 +62,7 @@ function buildSlideHTML(d, sc, preview=false) {
     <div class="${sc}" style="width:100%;height:100%;${bgStyle}">
       <div class="graph-line"></div><div class="graph-panel"></div>
       <div class="s-badge">${d.badge}</div>
-      <div class="s-headline">${d.headline}</div>
+      <div class="s-headline"${hlFontStyle}>${d.headline}</div>
       ${d.body ? `<div class="s-body">${d.body}</div>` : ''}
       ${d.fix ? `<div class="s-fix">${d.fix}</div>` : ''}
       ${userImg}
@@ -322,13 +331,13 @@ function _rRect(ctx, x, y, w, h, r) {
 
 // Returns total height of text content blocks so we can vertically center them.
 function _contentHeight(ctx, d, s, cw, fixMaxW) {
-  const bSize=7*s, hlSize=28*s, boSize=13*s, fSize=11*s, fpy=9*s;
+  const bSize=7*s, hlSize=(d.fontSize||28)*s, boSize=13*s, fSize=11*s, fpy=9*s;
 
   // Badge (single line pill)
   let h = (bSize + 5*s*2) + 14*s;
 
   // Headline
-  ctx.font = `900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  ctx.font = `900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing = '0px';
   h += _textLines(ctx, d.headline||'', cw).length * hlSize * 1.1 + 12*s;
 
@@ -447,7 +456,7 @@ function _drawNeonBackground(ctx, size, customBgImg, variant = 0) {
 
 function _drawNeonBadge(ctx, text, x, y, s, variant = 0) {
   const bSize = 7 * s;
-  ctx.font = `700 ${bSize}px 'VAG World Bold', sans-serif`;
+  ctx.font = `700 ${bSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing = `${0.12 * bSize}px`;
   const bText = (text || '').toUpperCase();
   const bPad = 12 * s;
@@ -588,8 +597,8 @@ function _drawSlideA(ctx, d, size, logoImg, userImg, customBgImg) {
 
   y += _drawNeonBadge(ctx, d.badge, px, y, s, 10);
 
-  const hlSize = 28*s;
-  ctx.font = `900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  const hlSize = (d.fontSize||28)*s;
+  ctx.font = `900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing='0px';
   ctx.fillStyle='#17101F';
   ctx.shadowBlur = 0;
@@ -633,8 +642,8 @@ function _drawSlideB(ctx, d, size, logoImg, userImg, customBgImg) {
 
   y += _drawNeonBadge(ctx, d.badge, px, y, s, 11);
 
-  const hlSize=28*s;
-  ctx.font=`900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  const hlSize=(d.fontSize||28)*s;
+  ctx.font=`900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing='0px'; ctx.fillStyle='#17101F';
   y += _drawText(ctx,d.headline,px,y,cw,hlSize*1.1);
   y += 12*s;
@@ -692,8 +701,8 @@ function _drawSlideC(ctx, d, size, logoImg, userImg, customBgImg) {
 
   y += _drawNeonBadge(ctx, d.badge, px, y, s, 2);
 
-  const hlSize=28*s;
-  ctx.font=`900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  const hlSize=(d.fontSize||28)*s;
+  ctx.font=`900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing='0px'; ctx.fillStyle='#FFFFFF';
   ctx.shadowColor='#8B32FF';
   ctx.shadowBlur=16*s;
@@ -750,8 +759,8 @@ function _drawSlideD(ctx, d, size, logoImg, userImg, customBgImg) {
 
   y += _drawNeonBadge(ctx, d.badge, px, y, s, 12);
 
-  const hlSize=34*s;
-  ctx.font=`900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  const hlSize=(d.fontSize||34)*s;
+  ctx.font=`900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing='0px'; ctx.fillStyle='#17101F';
   ctx.shadowBlur=0;
   y += _drawText(ctx,d.headline,px,y,cw,hlSize*1.04);
@@ -806,8 +815,8 @@ function _drawSlideE(ctx, d, size, logoImg, userImg, customBgImg) {
 
   y += _drawNeonBadge(ctx, d.badge, px, y, s, 4);
 
-  const hlSize=34*s;
-  ctx.font=`900 ${hlSize}px 'VAG World Bold', sans-serif`;
+  const hlSize=(d.fontSize||34)*s;
+  ctx.font=`900 ${hlSize}px '${_headFont(d)}', sans-serif`;
   ctx.letterSpacing='0px'; ctx.fillStyle='#FFFFFF';
   ctx.shadowColor='#8B32FF';
   ctx.shadowBlur=10*s;
@@ -833,16 +842,17 @@ function _drawSlideE(ctx, d, size, logoImg, userImg, customBgImg) {
 
 async function downloadSlide(i) {
   try {
-    // Ensure VAG World Bold is fully loaded before canvas renders text
-    await document.fonts.ready;
-    await Promise.all([
-      document.fonts.load(`900 28px 'VAG World Bold'`),
-      document.fonts.load(`700 10px 'VAG World Bold'`),
-      document.fonts.load(`500 16px Inter`),
-    ]);
-
     const sc = styleClass[selectedStyle];
     const d = { ...slidesData[i] };
+
+    // Ensure selected headline font is fully loaded before canvas renders text
+    const headFont = _headFont(d);
+    await document.fonts.ready;
+    await Promise.all([
+      document.fonts.load(`900 28px '${headFont}'`),
+      document.fonts.load(`700 10px '${headFont}'`),
+      document.fonts.load(`500 16px Inter`),
+    ]);
     const size = 1080;
 
     const canvas = document.createElement('canvas');

@@ -241,6 +241,20 @@
           <textarea class="modal-textarea" id="editHeadline" rows="2"></textarea>
         </div>
         <div class="modal-field">
+          <label class="modal-label">Шрифт заголовка</label>
+          <div class="font-picker" id="modalFontPicker"></div>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Размер заголовка</label>
+          <div class="img-size-row">
+            <span>Размер</span>
+            <span id="editFontSizeVal">28px</span>
+          </div>
+          <input type="range" id="editFontSize" class="img-size-range"
+                 min="14" max="52" value="28"
+                 oninput="updateEditFontSize(this.value)">
+        </div>
+        <div class="modal-field">
           <label class="modal-label">Описание</label>
           <textarea class="modal-textarea" id="editBody" rows="3"></textarea>
         </div>

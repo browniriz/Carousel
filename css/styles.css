@@ -4,6 +4,24 @@
   font-weight: bold;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Nokia Sans S60';
+  src: url('../ofont.ru_Nokia Sans S60.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Spectrashell';
+  src: url('../ofont.ru_Spectrashell.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Zing Rust';
+  src: url('../ofont.ru_Zing Rust.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 :root {
   --bg: #0E0E0E;
@@ -622,6 +640,21 @@ html, body {
 .bg-upload-section {
   margin-top:28px; width:100%; max-width:360px; text-align:center;
 }
+.font-picker {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+}
+.font-btn {
+  padding:8px 16px;
+  background:var(--bg3);
+  border:1.5px solid var(--gray2);
+  border-radius:10px;
+  color:var(--gray);
+  font-size:13px;
+  cursor:pointer; transition:all .2s;
+  white-space:nowrap;
+}
+.font-btn:hover { border-color:var(--orange); color:var(--white); }
+.font-btn.active { border-color:var(--orange); color:var(--white); background:rgba(255,92,0,0.12); }
 .bg-upload-title {
   font-size:11px; color:var(--gray); text-transform:uppercase;
   letter-spacing:.08em; margin-bottom:12px;
