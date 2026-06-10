@@ -456,7 +456,7 @@ function _drawNeonBackground(ctx, size, customBgImg, variant = 0) {
 
 function _drawNeonBadge(ctx, text, x, y, s, variant = 0) {
   const bSize = 7 * s;
-  ctx.font = `700 ${bSize}px '${_headFont(d)}', sans-serif`;
+  ctx.font = `700 ${bSize}px 'VAG World Bold', sans-serif`;
   ctx.letterSpacing = `${0.12 * bSize}px`;
   const bText = (text || '').toUpperCase();
   const bPad = 12 * s;
